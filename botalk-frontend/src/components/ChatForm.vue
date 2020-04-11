@@ -1,7 +1,12 @@
 <template>
   <div>
+    <ul>
+      <li v-for="message in messages" :key="message.timestamp">
+        {{ message.text }} name: {{ message.name }}
+      </li>
+    </ul>
     <input v-model="chatText" />
-    <p>Message is: {{ chatText }}</p>
+    <button v-on:click="sendMessage">Send</button>
   </div>
 </template>
 
@@ -9,8 +14,19 @@
 export default {
   data: function() {
     return {
-      chatText: ""
+      chatText: "",
+      messages: [],
     };
+  },
+  methods: {
+    sendMessage: function () {
+      this.messages.push({
+        name: "Me",
+        text: this.chatText,
+        timestamp: Date.now(),
+      });
+      this.chatText = "";
+    }
   }
 };
 </script>
