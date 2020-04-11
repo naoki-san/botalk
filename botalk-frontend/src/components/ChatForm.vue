@@ -6,7 +6,8 @@
       </li>
     </ul>
     <input v-model="message" />
-    <button v-on:click="sendMessage">Send</button>
+    <button v-on:click="sendTextMessage">Send</button>
+    <button v-on:click="startVoiceInput">Voice</button>
   </div>
 </template>
 
@@ -19,15 +20,12 @@ export default {
     };
   },
   methods: {
-    sendMessage: async function() {
-      const message = this.message;
+    sendMessage: async function(message) {
       this.messages.push({
         name: "Me",
         body: message,
         timestamp: Date.now()
       });
-
-      this.message = "";
 
       const data = { message };
       const response = await fetch("http://localhost:5000/message", {
@@ -43,6 +41,19 @@ export default {
         body: json.message,
         timestamp: Date.now()
       });
+    },
+    sendTextMessage: function() {
+      this.sendMessage(this.message);
+      this.message = "";
+    },
+    startVoiceInput: function() {
+      const recognition = new window.webkitSpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.onresult = event => {
+        const message = event.results[0][0].transcript;
+        this.sendMessage(message);
+      };
+      recognition.start();
     }
   }
 };
