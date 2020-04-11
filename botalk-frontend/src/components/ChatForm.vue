@@ -39,6 +39,8 @@ export default {
 
       const synth = window.speechSynthesis;
       const utterThis = new SpeechSynthesisUtterance(json.message);
+      utterThis.lang = "en-US";
+      utterThis.voice = synth.getVoices().find(v => v.lang === "en-US");
       synth.speak(utterThis);
 
       this.messages.push({
@@ -53,7 +55,7 @@ export default {
     },
     startVoiceInput: function() {
       const recognition = new window.webkitSpeechRecognition();
-      recognition.lang = 'en-US';
+      recognition.lang = "en-US";
       recognition.onresult = event => {
         const message = event.results[0][0].transcript;
         this.sendMessage(message);
