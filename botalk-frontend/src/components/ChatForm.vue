@@ -36,6 +36,11 @@ export default {
         body: JSON.stringify(data)
       });
       const json = await response.json();
+
+      const synth = window.speechSynthesis;
+      const utterThis = new SpeechSynthesisUtterance(json.message);
+      synth.speak(utterThis);
+
       this.messages.push({
         name: "Bot",
         body: json.message,
