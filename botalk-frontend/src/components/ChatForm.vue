@@ -2,10 +2,10 @@
   <div>
     <ul>
       <li v-for="message in messages" :key="message.timestamp">
-        {{ message.text }} name: {{ message.name }}
+        {{ message.body }} name: {{ message.name }}
       </li>
     </ul>
-    <input v-model="chatText" />
+    <input v-model="message" />
     <button v-on:click="sendMessage">Send</button>
   </div>
 </template>
@@ -14,18 +14,20 @@
 export default {
   data: function() {
     return {
-      chatText: "",
+      message: "",
       messages: [],
     };
   },
   methods: {
     sendMessage: function () {
+      const message = this.message;
       this.messages.push({
         name: "Me",
-        text: this.chatText,
+        body: message,
         timestamp: Date.now(),
       });
-      this.chatText = "";
+      this.message = "";
+      
     }
   }
 };
