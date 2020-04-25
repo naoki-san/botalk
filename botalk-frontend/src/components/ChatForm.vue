@@ -1,13 +1,20 @@
 <template>
   <div>
-    <ul>
-      <li v-for="message in messages" :key="message.timestamp">
-        {{ message.body }} name: {{ message.name }}
-      </li>
-    </ul>
-    <input v-model="message" />
-    <button v-on:click="sendTextMessage">Send</button>
-    <button v-on:click="startVoiceInput">Voice</button>
+    <div class="history">
+      <ul>
+        <li v-for="message in messages" :key="message.timestamp">
+          {{ message.body }}
+          <a :href="message.translationLink" target="_blank">Translate</a> 
+          <button @click="speech(message.body)">Voice</button>
+          name: {{ message.name }}
+        </li>
+      </ul>
+    </div>
+    <div class="input">
+      <input v-model="message" @keyup.enter="sendTextMessage"/>
+      <button @click="sendTextMessage">Send</button>
+      <button @click="startVoiceInput">Voice</button>
+    </div>
   </div>
 </template>
 
@@ -20,13 +27,27 @@ export default {
     };
   },
   methods: {
-    sendMessage: async function(message) {
+    speech: function(message) {
+      const synth = window.speechSynthesis;
+      const utterThis = new SpeechSynthesisUtterance(message);
+      utterThis.lang = "en-US";
+      utterThis.voice = synth.getVoices().find(v => v.lang === "en-US");
+      synth.speak(utterThis);
+    },
+    pushMessage: function(name, body) {
       this.messages.push({
-        name: "Me",
-        body: message,
+        name,
+        body,
+        translationLink: `https://www.deepl.com/translator#en/ja/${encodeURIComponent(body)}`,
         timestamp: Date.now()
       });
-
+      setTimeout(() => {
+        const container = this.$el.querySelector(".history");
+        container.scrollTop = container.scrollHeight;
+      }, 0);
+    },
+    sendMessage: async function(message) {
+      this.pushMessage("Me", message);
       const data = { message };
       const response = await fetch("http://localhost:5000/message", {
         method: "POST",
@@ -37,17 +58,9 @@ export default {
       });
       const json = await response.json();
 
-      const synth = window.speechSynthesis;
-      const utterThis = new SpeechSynthesisUtterance(json.message);
-      utterThis.lang = "en-US";
-      utterThis.voice = synth.getVoices().find(v => v.lang === "en-US");
-      synth.speak(utterThis);
+      this.speech(json.message);
 
-      this.messages.push({
-        name: "Bot",
-        body: json.message,
-        timestamp: Date.now()
-      });
+      this.pushMessage("Bot", json.message);
     },
     sendTextMessage: function() {
       this.sendMessage(this.message);
@@ -61,9 +74,24 @@ export default {
         this.sendMessage(message);
       };
       recognition.start();
-    }
+    },
   }
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+  .history {
+    height: 100vh;
+    padding-bottom: 30px;
+    overflow: scroll;
+    
+  }
+  .input {
+    background-color: #e6e6e6;
+    width: 100%;
+    padding: 16px;
+    position: fixed;
+    top: auto;
+    bottom: 0;
+  }
+</style>
