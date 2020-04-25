@@ -7,10 +7,13 @@ verify_ssl = true
 
 [scripts]
 start = "python hello.py"
+train = "python train.py"
 
 [packages]
 flask = "*"
 flask-cors = "*"
+chatterbot = "*"
+chatterbot-corpus = "*"
 
 [requires]
 python_version = "3.7"
