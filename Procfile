@@ -1,1 +1,1 @@
-web: python ./botalk-backend/hello.py
+web: python ./botalk-backend/train.py && python ./botalk-backend/hello.py
