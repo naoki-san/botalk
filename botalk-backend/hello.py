@@ -8,7 +8,7 @@ from chatterbot import ChatBot
 chatbot = ChatBot("Ron Obvious")
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": os.environ.get("PORT", "http://localhost:*")}})
 
 
 @app.route('/')
